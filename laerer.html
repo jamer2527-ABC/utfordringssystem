@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Lærervisning — Utfordringssystem</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background:#f0f2f5; }
+    nav { background:#4f46e5; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; }
+    nav h1 { color:white; font-size:1.1rem; }
+    .bruker { color:white; font-size:0.9rem; }
+    .container { max-width:900px; margin:2rem auto; padding:0 1rem; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+    .topbar h2 { font-size:1.3rem; color:#1a1a2e; }
+    .sak { background:white; border-radius:12px; padding:1.25rem; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.07); }
+    .sak-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+    .sak-info h3 { font-size:1rem; color:#1a1a2e; margin-bottom:4px; }
+    .sak-info p { font-size:0.85rem; color:#666; }
+    .badges { display:flex; gap:8px; margin-top:8px; }
+    .badge { padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+    .kritisk { background:#fee2e2; color:#b91c1c; }
+    .viktig  { background:#fef3c7; color:#92400e; }
+    .lav     { background:#d1fae5; color:#065f46; }
+    .aapen   { background:#e0e7ff; color:#3730a3; }
+    .paagaar { background:#fef3c7; color:#92400e; }
+    .loest   { background:#d1fae5; color:#065f46; }
+    .svar-seksjon { border-top:1px solid #f0f2f5; padding-top:12px; margin-top:12px; }
+    .svar-seksjon label { font-size:0.85rem; color:#444; display:block; margin-bottom:6px; }
+    .svar-rad { display:flex; gap:8px; }
+    textarea { flex:1; padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-size:0.9rem; font-family:'Segoe UI',sans-serif; resize:none; height:70px; }
+    textarea:focus { outline:none; border-color:#4f46e5; }
+    .svar-btn { background:#4f46e5; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:0.9rem; font-weight:600; align-self:flex-end; }
+    .svar-btn:hover { background:#4338ca; }
+    select.status { padding:6px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem; cursor:pointer; }
+    .suksess-msg { display:none; color:#065f46; font-size:0.85rem; margin-top:6px; font-weight:600; }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1>Utfordringssystem</h1>
+    <span class="bruker">Innlogget som: <strong>laerer01</strong> (Lærer) &nbsp;|&nbsp; <a href="index.html" style="color:white">Logg ut</a></span>
+  </nav>
+  <div class="container">
+    <div class="topbar">
+      <h2>Alle saker</h2>
+    </div>
+
+    <div class="sak">
+      <div class="sak-header">
+        <div class="sak-info">
+          <h3>Forstår ikke oppgave 3 i matematikk</h3>
+          <p>Registrert: 02.06.2026 — av elev01</p>
+          <div class="badges">
+            <span class="badge kritisk">Kritisk</span>
+            <span class="badge aapen" id="status1">Åpen</span>
+          </div>
+        </div>
+        <select class="status" onchange="endreStatus('status1', this.value)">
+          <option value="aapen">Åpen</option>
+          <option value="paagaar">Pågår</option>
+          <option value="loest">Løst</option>
+        </select>
+      </div>
+      <div class="svar-seksjon">
+        <label>Skriv svar til elev:</label>
+        <div class="svar-rad">
+          <textarea placeholder="Skriv ditt svar her..."></textarea>
+          <button class="svar-btn" onclick="sendSvar(this)">Send svar</button>
+        </div>
+        <div class="suksess-msg">✅ Svar sendt!</div>
+      </div>
+    </div>
+
+    <div class="sak">
+      <div class="sak-header">
+        <div class="sak-info">
+          <h3>PC starter ikke på klasserommet</h3>
+          <p>Registrert: 01.06.2026 — av elev02</p>
+          <div class="badges">
+            <span class="badge viktig">Viktig</span>
+            <span class="badge paagaar" id="status2">Pågår</span>
+          </div>
+        </div>
+        <select class="status" onchange="endreStatus('status2', this.value)">
+          <option value="aapen">Åpen</option>
+          <option value="paagaar" selected>Pågår</option>
+          <option value="loest">Løst</option>
+        </select>
+      </div>
+      <div class="svar-seksjon">
+        <label>Skriv svar til elev:</label>
+        <div class="svar-rad">
+          <textarea placeholder="Skriv ditt svar her..."></textarea>
+          <button class="svar-btn" onclick="sendSvar(this)">Send svar</button>
+        </div>
+        <div class="suksess-msg">✅ Svar sendt!</div>
+      </div>
+    </div>
+
+    <div class="sak">
+      <div class="sak-header">
+        <div class="sak-info">
+          <h3>Mangler tilgang til Teams</h3>
+          <p>Registrert: 31.05.2026 — av elev03</p>
+          <div class="badges">
+            <span class="badge lav">Lav</span>
+            <span class="badge loest" id="status3">Løst</span>
+          </div>
+        </div>
+        <select class="status" onchange="endreStatus('status3', this.value)">
+          <option value="aapen">Åpen</option>
+          <option value="paagaar">Pågår</option>
+          <option value="loest" selected>Løst</option>
+        </select>
+      </div>
+      <div class="svar-seksjon">
+        <label>Skriv svar til elev:</label>
+        <div class="svar-rad">
+          <textarea placeholder="Skriv ditt svar her..."></textarea>
+          <button class="svar-btn" onclick="sendSvar(this)">Send svar</button>
+        </div>
+        <div class="suksess-msg">✅ Svar sendt!</div>
+      </div>
+    </div>
+
+  </div>
+  <script>
+    function endreStatus(id, verdi) {
+      const badge = document.getElementById(id);
+      badge.className = 'badge ' + verdi;
+      const tekst = { aapen:'Åpen', paagaar:'Pågår', loest:'Løst' };
+      badge.textContent = tekst[verdi];
+    }
+    function sendSvar(btn) {
+      const seksjon = btn.closest('.svar-seksjon');
+      const tekst = seksjon.querySelector('textarea').value.trim();
+      if (!tekst) { alert('Skriv et svar først!'); return; }
+      seksjon.querySelector('.suksess-msg').style.display = 'block';
+      seksjon.querySelector('textarea').value = '';
+    }
+  </script>
+</body>
+</html>

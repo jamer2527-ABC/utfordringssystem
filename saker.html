@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Saker — Utfordringssystem</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background:#f0f2f5; }
+    nav { background:#4f46e5; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; }
+    nav h1 { color:white; font-size:1.1rem; }
+    .bruker { color:white; font-size:0.9rem; opacity:0.85; }
+    .container { max-width:900px; margin:2rem auto; padding:0 1rem; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+    .topbar h2 { font-size:1.3rem; color:#1a1a2e; }
+    .ny-sak-btn { background:#4f46e5; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:0.95rem; }
+    .ny-sak-btn:hover { background:#4338ca; }
+    .sak { background:white; border-radius:12px; padding:1.25rem; margin-bottom:12px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow:0 1px 4px rgba(0,0,0,0.07); }
+    .sak-info h3 { font-size:1rem; color:#1a1a2e; margin-bottom:4px; }
+    .sak-info p { font-size:0.85rem; color:#666; }
+    .badges { display:flex; gap:8px; margin-top:8px; }
+    .badge { padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+    .kritisk { background:#fee2e2; color:#b91c1c; }
+    .viktig  { background:#fef3c7; color:#92400e; }
+    .lav     { background:#d1fae5; color:#065f46; }
+    .aapen   { background:#e0e7ff; color:#3730a3; }
+    .paagaar { background:#fef3c7; color:#92400e; }
+    .loest   { background:#d1fae5; color:#065f46; }
+    .svar-btn { background:#f0f2f5; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:0.85rem; color:#4f46e5; font-weight:600; }
+    .svar-btn:hover { background:#e0e7ff; }
+    .tom { color:#666; text-align:center; padding:2rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1>Utfordringssystem</h1>
+    <span class="bruker">Innlogget som: <strong>elev01</strong> (Elev) &nbsp;|&nbsp; <a href="index.html" style="color:white">Logg ut</a></span>
+  </nav>
+  <div class="container">
+    <div class="topbar">
+      <h2>Mine saker</h2>
+      <button class="ny-sak-btn" onclick="window.location.href='nysak.html'">+ Ny sak</button>
+    </div>
+    <div id="sakliste"><p class="tom">Laster saker...</p></div>
+  </div>
+  <script>
+    async function lastSaker() {
+      const svar = await fetch('/api/saker');
+      const saker = await svar.json();
+      const liste = document.getElementById('sakliste');
+      if (saker.length === 0) {
+        liste.innerHTML = '<p class="tom">Ingen saker registrert enda.</p>';
+        return;
+      }
+      liste.innerHTML = saker.map(s => `
+        <div class="sak">
+          <div class="sak-info">
+            <h3>${s.tittel}</h3>
+            <p>Registrert: ${s.opprettet.substring(0,10)}</p>
+            <div class="badges">
+              <span class="badge ${s.kategori}">${s.kategori.charAt(0).toUpperCase() + s.kategori.slice(1)}</span>
+              <span class="badge ${s.status}">${s.status === 'aapen' ? 'Åpen' : s.status === 'paagaar' ? 'Pågår' : 'Løst'}</span>
+            </div>
+          </div>
+          <button class="svar-btn">Se svar</button>
+        </div>
+      `).join('');
+    }
+    lastSaker();
+  </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin — Utfordringssystem</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background:#f0f2f5; }
+    nav { background:#1a1a2e; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; }
+    nav h1 { color:white; font-size:1.1rem; }
+    .bruker { color:white; font-size:0.9rem; }
+    .container { max-width:900px; margin:2rem auto; padding:0 1rem; }
+    h2 { font-size:1.3rem; color:#1a1a2e; margin-bottom:1rem; }
+    .kort { background:white; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 1px 4px rgba(0,0,0,0.07); }
+    table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    th { text-align:left; padding:10px 12px; background:#f0f2f5; color:#444; font-weight:600; border-radius:8px; }
+    td { padding:10px 12px; border-bottom:1px solid #f0f2f5; }
+    .rolle-badge { padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+    .elev { background:#e0e7ff; color:#3730a3; }
+    .laerer { background:#d1fae5; color:#065f46; }
+    .admin { background:#fee2e2; color:#b91c1c; }
+    .handlinger { display:flex; gap:6px; }
+    .slett-btn { background:#fee2e2; color:#b91c1c; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; }
+    .slett-btn:hover { background:#fecaca; }
+    .oppgrader-btn { background:#e0e7ff; color:#3730a3; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; }
+    .oppgrader-btn:hover { background:#c7d2fe; }
+    .ny-bruker { display:flex; gap:8px; margin-top:1rem; }
+    .ny-bruker input, .ny-bruker select { padding:9px 12px; border:1px solid #ddd; border-radius:8px; font-size:0.9rem; }
+    .ny-bruker input { flex:1; }
+    .legg-til-btn { background:#4f46e5; color:white; border:none; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:600; }
+    .legg-til-btn:hover { background:#4338ca; }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1>Utfordringssystem — Admin</h1>
+    <span class="bruker">Innlogget som: <strong>admin01</strong> (Admin) &nbsp;|&nbsp; <a href="index.html" style="color:white">Logg ut</a></span>
+  </nav>
+  <div class="container">
+    <div class="kort">
+      <h2>Brukeradministrasjon</h2>
+      <table id="brukertabell">
+        <tr>
+          <th>Brukernavn</th>
+          <th>Epost</th>
+          <th>Rolle</th>
+          <th>Handlinger</th>
+        </tr>
+        <tr>
+          <td>elev01</td>
+          <td>elev01@skole.no</td>
+          <td><span class="rolle-badge elev">Elev</span></td>
+          <td><div class="handlinger">
+            <button class="oppgrader-btn" onclick="oppgrader(this)">Oppgrader</button>
+            <button class="slett-btn" onclick="slettBruker(this)">Slett</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td>elev02</td>
+          <td>elev02@skole.no</td>
+          <td><span class="rolle-badge elev">Elev</span></td>
+          <td><div class="handlinger">
+            <button class="oppgrader-btn" onclick="oppgrader(this)">Oppgrader</button>
+            <button class="slett-btn" onclick="slettBruker(this)">Slett</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td>laerer01</td>
+          <td>laerer01@skole.no</td>
+          <td><span class="rolle-badge laerer">Lærer</span></td>
+          <td><div class="handlinger">
+            <button class="oppgrader-btn" onclick="oppgrader(this)">Oppgrader</button>
+            <button class="slett-btn" onclick="slettBruker(this)">Slett</button>
+          </div></td>
+        </tr>
+      </table>
+      <div class="ny-bruker">
+        <input type="text" id="nyBruker" placeholder="Brukernavn" />
+        <input type="text" id="nyEpost" placeholder="Epost" />
+        <select id="nyRolle">
+          <option value="elev">Elev</option>
+          <option value="laerer">Lærer</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button class="legg-til-btn" onclick="leggTilBruker()">+ Legg til</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    function slettBruker(btn) {
+      if (confirm('Sikker på at du vil slette denne brukeren?')) {
+        btn.closest('tr').remove();
+      }
+    }
+    function oppgrader(btn) {
+      const badge = btn.closest('tr').querySelector('.rolle-badge');
+      if (badge.textContent === 'Elev') {
+        badge.textContent = 'Lærer';
+        badge.className = 'rolle-badge laerer';
+      } else if (badge.textContent === 'Lærer') {
+        badge.textContent = 'Admin';
+        badge.className = 'rolle-badge admin';
+      }
+    }
+    function leggTilBruker() {
+      const bruker = document.getElementById('nyBruker').value.trim();
+      const epost = document.getElementById('nyEpost').value.trim();
+      const rolle = document.getElementById('nyRolle').value;
+      if (!bruker || !epost) { alert('Fyll inn brukernavn og epost!'); return; }
+      const tabell = document.getElementById('brukertabell');
+      const rad = tabell.insertRow(-1);
+      rad.innerHTML = `
+        <td>${bruker}</td>
+        <td>${epost}</td>
+        <td><span class="rolle-badge ${rolle}">${rolle.charAt(0).toUpperCase() + rolle.slice(1)}</span></td>
+        <td><div class="handlinger">
+          <button class="oppgrader-btn" onclick="oppgrader(this)">Oppgrader</button>
+          <button class="slett-btn" onclick="slettBruker(this)">Slett</button>
+        </div></td>`;
+      document.getElementById('nyBruker').value = '';
+      document.getElementById('nyEpost').value = '';
+    }
+  </script>
+</body>
+</html>
