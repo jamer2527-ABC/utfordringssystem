@@ -10,8 +10,7 @@
     nav h1 { color:white; font-size:1.1rem; }
     .bruker { color:white; font-size:0.9rem; }
     .container { max-width:900px; margin:2rem auto; padding:0 1rem; }
-    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
-    .topbar h2 { font-size:1.3rem; color:#1a1a2e; }
+    h2 { font-size:1.3rem; color:#1a1a2e; margin-bottom:1rem; }
     .sak { background:white; border-radius:12px; padding:1.25rem; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.07); }
     .sak-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
     .sak-info h3 { font-size:1rem; color:#1a1a2e; margin-bottom:4px; }
@@ -33,6 +32,7 @@
     .svar-btn:hover { background:#4338ca; }
     select.status { padding:6px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem; cursor:pointer; }
     .suksess-msg { display:none; color:#065f46; font-size:0.85rem; margin-top:6px; font-weight:600; }
+    .tom { color:#666; text-align:center; padding:2rem; }
   </style>
 </head>
 <body>
@@ -41,103 +41,74 @@
     <span class="bruker">Innlogget som: <strong>laerer01</strong> (Lærer) &nbsp;|&nbsp; <a href="index.html" style="color:white">Logg ut</a></span>
   </nav>
   <div class="container">
-    <div class="topbar">
-      <h2>Alle saker</h2>
-    </div>
-
-    <div class="sak">
-      <div class="sak-header">
-        <div class="sak-info">
-          <h3>Forstår ikke oppgave 3 i matematikk</h3>
-          <p>Registrert: 02.06.2026 — av elev01</p>
-          <div class="badges">
-            <span class="badge kritisk">Kritisk</span>
-            <span class="badge aapen" id="status1">Åpen</span>
-          </div>
-        </div>
-        <select class="status" onchange="endreStatus('status1', this.value)">
-          <option value="aapen">Åpen</option>
-          <option value="paagaar">Pågår</option>
-          <option value="loest">Løst</option>
-        </select>
-      </div>
-      <div class="svar-seksjon">
-        <label>Skriv svar til elev:</label>
-        <div class="svar-rad">
-          <textarea placeholder="Skriv ditt svar her..."></textarea>
-          <button class="svar-btn" onclick="sendSvar(this)">Send svar</button>
-        </div>
-        <div class="suksess-msg">✅ Svar sendt!</div>
-      </div>
-    </div>
-
-    <div class="sak">
-      <div class="sak-header">
-        <div class="sak-info">
-          <h3>PC starter ikke på klasserommet</h3>
-          <p>Registrert: 01.06.2026 — av elev02</p>
-          <div class="badges">
-            <span class="badge viktig">Viktig</span>
-            <span class="badge paagaar" id="status2">Pågår</span>
-          </div>
-        </div>
-        <select class="status" onchange="endreStatus('status2', this.value)">
-          <option value="aapen">Åpen</option>
-          <option value="paagaar" selected>Pågår</option>
-          <option value="loest">Løst</option>
-        </select>
-      </div>
-      <div class="svar-seksjon">
-        <label>Skriv svar til elev:</label>
-        <div class="svar-rad">
-          <textarea placeholder="Skriv ditt svar her..."></textarea>
-          <button class="svar-btn" onclick="sendSvar(this)">Send svar</button>
-        </div>
-        <div class="suksess-msg">✅ Svar sendt!</div>
-      </div>
-    </div>
-
-    <div class="sak">
-      <div class="sak-header">
-        <div class="sak-info">
-          <h3>Mangler tilgang til Teams</h3>
-          <p>Registrert: 31.05.2026 — av elev03</p>
-          <div class="badges">
-            <span class="badge lav">Lav</span>
-            <span class="badge loest" id="status3">Løst</span>
-          </div>
-        </div>
-        <select class="status" onchange="endreStatus('status3', this.value)">
-          <option value="aapen">Åpen</option>
-          <option value="paagaar">Pågår</option>
-          <option value="loest" selected>Løst</option>
-        </select>
-      </div>
-      <div class="svar-seksjon">
-        <label>Skriv svar til elev:</label>
-        <div class="svar-rad">
-          <textarea placeholder="Skriv ditt svar her..."></textarea>
-          <button class="svar-btn" onclick="sendSvar(this)">Send svar</button>
-        </div>
-        <div class="suksess-msg">✅ Svar sendt!</div>
-      </div>
-    </div>
-
+    <h2>Alle saker</h2>
+    <div id="sakliste"><p class="tom">Laster saker...</p></div>
   </div>
   <script>
-    function endreStatus(id, verdi) {
-      const badge = document.getElementById(id);
-      badge.className = 'badge ' + verdi;
-      const tekst = { aapen:'Åpen', paagaar:'Pågår', loest:'Løst' };
-      badge.textContent = tekst[verdi];
+    async function lastSaker() {
+    const svar = await fetch('/api/saker');
+    const saker = await svar.json();
+    const liste = document.getElementById('sakliste');
+    if (saker.length === 0) {
+      liste.innerHTML = '<p class="tom">Ingen saker enda.</p>';
+      return;
     }
-    function sendSvar(btn) {
-      const seksjon = btn.closest('.svar-seksjon');
-      const tekst = seksjon.querySelector('textarea').value.trim();
-      if (!tekst) { alert('Skriv et svar først!'); return; }
-      seksjon.querySelector('.suksess-msg').style.display = 'block';
-      seksjon.querySelector('textarea').value = '';
+    liste.innerHTML = saker.map(s => `
+      <div class="sak">
+        <div class="sak-header">
+          <div class="sak-info">
+            <h3>${s.tittel}</h3>
+            <p>Registrert: ${s.opprettet.substring(0,10)}</p>
+            <div class="badges">
+              <span class="badge ${s.kategori}">${s.kategori.charAt(0).toUpperCase() + s.kategori.slice(1)}</span>
+              <span class="badge ${s.status}" id="status-${s.id}">${s.status === 'aapen' ? 'Åpen' : s.status === 'paagaar' ? 'Pågår' : 'Løst'}</span>
+            </div>
+          </div>
+          <select class="status" onchange="endreStatus(${s.id}, this.value)">
+            <option value="aapen" ${s.status==='aapen'?'selected':''}>Åpen</option>
+            <option value="paagaar" ${s.status==='paagaar'?'selected':''}>Pågår</option>
+            <option value="loest" ${s.status==='loest'?'selected':''}>Løst</option>
+          </select>
+        </div>
+        <div class="svar-seksjon">
+          <label>Skriv svar til elev:</label>
+          <div class="svar-rad">
+            <textarea id="svar-${s.id}" placeholder="Skriv ditt svar her..."></textarea>
+            <button class="svar-btn" onclick="sendSvar(${s.id}, this)">Send svar</button>
+          </div>
+          <div class="suksess-msg" id="suksess-${s.id}">✅ Svar sendt!</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function endreStatus(id, verdi) {
+    const badge = document.getElementById('status-' + id);
+    badge.className = 'badge ' + verdi;
+    badge.textContent = verdi === 'aapen' ? 'Åpen' : verdi === 'paagaar' ? 'Pågår' : 'Løst';
+    await fetch('/api/endrestatus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status: verdi })
+    });
+  }
+
+  async function sendSvar(sakId, btn) {
+    const tekst = document.getElementById('svar-' + sakId).value.trim();
+    if (!tekst) { alert('Skriv et svar først!'); return; }
+    const svar = await fetch('/api/sendsvar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sakId, innhold: tekst })
+    });
+    const data = await svar.json();
+    if (data.status === 'ok') {
+      document.getElementById('suksess-' + sakId).style.display = 'block';
+      document.getElementById('svar-' + sakId).value = '';
     }
+  }
+
+  lastSaker();
   </script>
 </body>
 </html>
